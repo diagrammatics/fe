@@ -1,6 +1,8 @@
 # fe
 A *tiny*, embeddable language implemented in ANSI C
 
+(this fork targets tcc)
+
 ```clojure
 (= reverse (fn (lst)
   (let res nil)
