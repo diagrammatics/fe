@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define FE_VERSION "1.0"
+#define FE_VERSION "1.01"
 
 typedef float fe_Number;
 typedef struct fe_Object fe_Object;

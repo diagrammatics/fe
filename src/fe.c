@@ -1,24 +1,8 @@
 /*
-** Copyright (c) 2020 rxi
-**
-** Permission is hereby granted, free of charge, to any person obtaining a copy
-** of this software and associated documentation files (the "Software"), to
-** deal in the Software without restriction, including without limitation the
-** rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-** sell copies of the Software, and to permit persons to whom the Software is
-** furnished to do so, subject to the following conditions:
-**
-** The above copyright notice and this permission notice shall be included in
-** all copies or substantial portions of the Software.
-**
-** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-** FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-** IN THE SOFTWARE.
+** Copyright (c) 2020 rxi - see license
 */
+
+#define FE_STANDALONE
 
 #include <string.h>
 #include "fe.h"
@@ -56,6 +40,47 @@ static const char *typenames[] = {
   "pair", "free", "nil", "number", "symbol", "string",
   "func", "macro", "prim", "cfunc", "ptr"
 };
+
+static const char *docstring =
+    "(doc) provides information on fe's built-in symbols, keywords, and types:\n"
+    "- let: Binds a value to a variable within a local scope.\n"
+    "- =: Sets the value of a variable.\n"
+    "- if: Evaluates a condition and executes one of two branches.\n"
+    "- fn: Defines a new function.\n"
+    "- mac: Defines a new macro.\n"
+    "- while: Repeatedly executes a block of code as long as a condition is true.\n"
+    "- quote: Returns its argument without evaluating it.\n"
+    "- and: Logical AND of all arguments.\n"
+    "- or: Logical OR of all arguments.\n"
+    "- do: Executes a series of expressions and returns the result of the last one.\n"
+    "- cons: Constructs a new pair from two arguments.\n"
+    "- car: Returns the first element of a pair.\n"
+    "- cdr: Returns the second element of a pair.\n"
+    "- setcar: Sets the first element of a pair.\n"
+    "- setcdr: Sets the second element of a pair.\n"
+    "- list: Creates a new list from its arguments.\n"
+    "- not: Logical negation.\n"
+    "- is: Checks if two expressions are equal.\n"
+    "- atom: Checks if an expression is not a pair.\n"
+    "- print: Prints its arguments to stdout.\n"
+    "- <: Checks if one number is less than another.\n"
+    "- <=: Checks if one number is less than or equal to another.\n"
+    "- +: Sums its arguments.\n"
+    "- -: Subtracts the second and subsequent arguments from the first.\n"
+    "- *: Multiplies its arguments.\n"
+    "- /: Divides the first argument by the second and subsequent arguments.\n\n"
+    "Primitive types:\n"
+    "- pair: A compound data type that holds two values or two variables.\n"
+    "- free: A type representing unused or recyclable memory space.\n"
+    "- nil: The empty list or 'false' in logical contexts.\n"
+    "- number: A numeric data type for arithmetic operations.\n"
+    "- symbol: A data type used for variable names and identifiers.\n"
+    "- string: A sequence of characters.\n"
+    "- func: A user-defined or built-in function.\n"
+    "- macro: A user-defined or built-in macro.\n"
+    "- prim: A primitive function inherent to the Lisp system.\n"
+    "- cfunc: A C function callable from Lisp code.\n"
+    "- ptr: A pointer to arbitrary data, used for interfacing with C.\n";
 
 typedef union { fe_Object *o; fe_CFunc f; fe_Number n; char c; } Value;
 
@@ -338,7 +363,6 @@ fe_Object* fe_cdr(fe_Context *ctx, fe_Object *obj) {
   return cdr(checktype(ctx, obj, FE_TPAIR));
 }
 
-
 static void writestr(fe_Context *ctx, fe_WriteFn fn, void *udata, const char *s) {
   while (*s) { fn(ctx, udata, *s++); }
 }
@@ -554,6 +578,10 @@ fe_Object* fe_readfp(fe_Context *ctx, FILE *fp) {
   return fe_read(ctx, readfp, fp);
 }
 
+static fe_Object *fn_doc(fe_Context *ctx, fe_Object *args) {
+    (void)args;
+    return fe_string(ctx, docstring);
+}
 
 static fe_Object* eval(fe_Context *ctx, fe_Object *obj, fe_Object *env, fe_Object **bind);
 
@@ -821,6 +849,9 @@ fe_Context* fe_open(void *ptr, int size) {
     fe_set(ctx, fe_symbol(ctx, primnames[i]), v);
     fe_restoregc(ctx, save);
   }
+  
+  fe_Object *doc_func = fe_cfunc(ctx, fn_doc);
+  fe_set(ctx, fe_symbol(ctx, "doc"), doc_func);
 
   return ctx;
 }
