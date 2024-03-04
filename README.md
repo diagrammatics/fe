@@ -25,7 +25,7 @@ A *tiny*, embeddable language implemented in ANSI C
 * Simple mark and sweep garbage collector
 * Easy to use C API
 * Portable ANSI C — works on 32 and 64bit
-* Concise — less than 800 sloc
+* Aims for concise implementation
 
 ---
 
@@ -43,3 +43,7 @@ likely not be merged. Bug reports and questions are welcome.
 ## License
 This library is free software; you can redistribute it and/or modify it under
 the terms of the MIT license. See [LICENSE](LICENSE) for details.
+
+## Todo
+[x] implement file loading from interpreter
+[ ] test file loading from interpreter

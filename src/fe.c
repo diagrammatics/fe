@@ -622,6 +622,27 @@ static fe_Object* argstoenv(fe_Context *ctx, fe_Object *prm, fe_Object *arg, fe_
   return env;
 }
 
+static fe_Object* fn_load(fe_Context *ctx, fe_Object *args) {
+    fe_Object *filename_obj = fe_nextarg(ctx, &args);
+    char filename[1024];
+    fe_tostring(ctx, filename_obj, filename, sizeof(filename));
+
+    FILE *file = fopen(filename, "r");
+    if (!file) {
+        fe_error(ctx, "could not open file");
+        return NULL;
+    }
+
+    fe_Object *result = &nil;
+    while (!feof(file)) {
+        fe_Object *expr = fe_readfp(ctx, file);
+        if (!expr) break;
+        result = fe_eval(ctx, expr);
+    }
+    fclose(file);
+    return result;
+}
+
 
 #define evalarg() eval(ctx, fe_nextarg(ctx, &arg), env, NULL)
 
@@ -851,7 +872,11 @@ fe_Context* fe_open(void *ptr, int size) {
   }
   
   fe_Object *doc_func = fe_cfunc(ctx, fn_doc);
-  fe_set(ctx, fe_symbol(ctx, "doc"), doc_func);
+  fe_set(ctx, fe_symbol(ctx, "doc"), doc_func); // herehere
+  
+  fe_Object *load_func = fe_cfunc(ctx, fn_load);
+  fe_set(ctx, fe_symbol(ctx, "load"), load_func);
+
 
   return ctx;
 }

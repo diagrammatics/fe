@@ -1,11 +1,13 @@
 
 # Implementation
 
+(this a fork of rxi's fe, goals will diverge)
+
 ## Overview
 The implementation aims to fulfill the following goals:
 * Small memory usage within a fixed-sized memory region — no mallocs
 * Practical for small scripts (extension scripts, config files)
-* Concise source — less than 1000 loc
+* Concise source — less than 5000 loc
 * Portable ANSI C (Windows, Linux, DOS — 32 and 64bit)
 * Simple and easy to understand source
 * Simple and easy to use C API
